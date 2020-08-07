@@ -1,3 +1,9 @@
+"""
+The Originalfile belongs to BIRADS_classifier under GNU Affero General Public License v3.0
+and is available here: https://github.com/nyukat/BIRADS_classifier.git
+Neura Health made modifications to run with neuradetect application.
+"""
+
 import warnings
 warnings.filterwarnings('ignore',category=FutureWarning)
 import json
