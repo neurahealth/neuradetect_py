@@ -1,5 +1,5 @@
 """
-The Originalfile belongs to breast_cancer_classifier under GNU Affero General Public License v3.0
+The Originalfile belongs to GMIC under GNU Affero General Public License v3.0
 and is available here: https://github.com/nyukat/GMIC.git
 Neura Health made modifications to fils to run with neuradetect application.
 """
