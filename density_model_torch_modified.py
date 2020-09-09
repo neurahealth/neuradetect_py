@@ -1,4 +1,4 @@
-  
+
 """
 The Originalfile belongs to breast density classifier under GNU Affero General Public License v3.0
 and is available here: https://github.com/nyukat/breast_density_classifier.git
@@ -301,7 +301,9 @@ class PubsubMessageHandler():
                 image = Image.open(r'{0}/{1}'.format(msg_id,images[img]))
                 data = asarray(image)
             if data.shape < (2600,2000):
-                invalid = {"Density_prediction":"invalid_image_size"}
+                invalid = {"Density_prediction":{
+                  "error":"true",
+                  "msg":"invalid uploaded image, Size should be minimum 2600x2000 pixels"}
                 if (not len(firebase_admin._apps)):
                     cred = credentials.Certificate(credential_json_file)
                     fa=firebase_admin.initialize_app(cred, {"databaseURL": databaseURL,'storageBucket':storageBucket})
