@@ -592,7 +592,7 @@ class PubsubMessageHandler():
             visual_invalid ={"visualization":{
 				"msg":"invalid image resolutions for visualizations",
                 "error":"true"}}
-			if (not len(firebase_admin._apps)):
+	    if (not len(firebase_admin._apps)):
             	cred = credentials.Certificate(credential_json_file)
                 fa=firebase_admin.initialize_app(cred, {"databaseURL": databaseURL,'storageBucket':storageBucket})
                 fc=firebase_admin.firestore.client(fa)
@@ -600,14 +600,15 @@ class PubsubMessageHandler():
                 doc_ref = db.collection(u'stripe_customers/{0}/results'.format(userId)).document(currentTime)
                 doc_ref.update(invalid)
                 doc_ref.update(visual_invalid)
-             else:
+		my_logger.info("invalid images")
+            else:
                 print('alredy initialize')
                 db = firestore.client()
                 doc_ref = db.collection(u'stripe_customers/{0}/results'.format(userId)).document(currentTime)
                 doc_ref.update(invalid)
                 doc_ref.update(visual_invalid)
+		my_logger.info("invalid images")
 
-       		my_logger.info("invalid images CC-MLO info saved in firebase")
             logs_bucket = logs_bucket
             credential_json_file = credential_json_file
             storage_client = store.Client.from_service_account_json(credential_json_file)
