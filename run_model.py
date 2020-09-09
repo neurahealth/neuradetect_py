@@ -73,7 +73,7 @@ class PubsubMessageHandler():
             parser.add_argument('--model-path', default='models/sample_image_model.p')
             parser.add_argument('--data-path', default='sample_output/{}/data.pkl'.format(pros_id))
             parser.add_argument('--image-path', default='sample_output/{}/cropped_images'.format(pros_id))
-            parser.add_argument('--output-path', default='sample_output/{}/image_predictions.csv'.format(pros_id))
+            parser.add_argument('--output-path', default='sample_output/{0}/image_predictions-{0}.csv'.format(pros_id))
             parser.add_argument('--batch-size', default=1, type=int)
             parser.add_argument('--seed', default=0, type=int)
             parser.add_argument('--use-heatmaps', action="store_true")
@@ -273,7 +273,7 @@ class PubsubMessageHandler():
         
         try:
             breast_cancer={}
-            with open('sample_output/{}/image_predictions.csv'.format(pros_id)) as f: #this code is reading image prediction csv result file of breast canceer classifier
+            with open('sample_output/{0}/image_predictions-{0}.csv'.format(pros_id)) as f: #this code is reading image prediction csv result file of breast canceer classifier
                 reader = csv.DictReader(f)           #and convert into json
                 rows = list(reader)
 
@@ -282,7 +282,8 @@ class PubsubMessageHandler():
 
             with open('image_predictions-{}.json'.format(pros_id)) as json_file:
                 breast_cancer = json.load(json_file)        #loading json data in dictionary
-                result ={"Image_Predictions": breast_cancer}
+                breast_cancer.update({'error':'false'})
+                result ={"Image_Predictions":breast_cancer}
             
         # might gives error in run-time for initialization to rule out such error checking initialization of firebase app again
 
@@ -312,12 +313,12 @@ class PubsubMessageHandler():
             log_blob.upload_from_filename('{}.log'.format(msg_id))
             os.remove('./{}.log'.format(msg_id))
             os.remove('image_predictions-{}.json'.format(pros_id))
+            shutil.rmtree("sample_data/{}".format(pros_id), ignore_errors=True)
             shutil.rmtree("sample_output/{}".format(pros_id), ignore_errors=True)
             print("waiting for new message...")
 
         except Exception as e:
             print("ERROR:",e)
-
 def main():
     project_id = os.getenv("project_id") # from .env file here we'll check for development environment and production environment
     print('Project id : ',project_id)
