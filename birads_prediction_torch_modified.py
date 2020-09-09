@@ -55,7 +55,7 @@ class PubsubMessageHandler():
 
         path = d['path']
 
-        url = d['url']               # url is using to copy images from firestore to root directory 
+        url = d['url']               # url is using to copy images from firestore
         fileName = d['fileName']     # names of files store in firestore i.e L-CC, R-CC , L-MLO , R-MLO
 
         currentTime = d['currentTime']  #currentTime is used as a result id
@@ -181,7 +181,8 @@ class PubsubMessageHandler():
                 results={'BI_RADS_prediction':{
                 'BI_RADS_zero': str("%.2f"%(birads0_prob*100)),
                 'BI_RADS_one': str("%.2f"%(birads1_prob*100)),
-                'BI_RADS_two': str("%.2f"%(birads2_prob*100))
+                'BI_RADS_two': str("%.2f"%(birads2_prob*100)),
+                'error':'false'
                 }
                 }
 
@@ -229,7 +230,9 @@ class PubsubMessageHandler():
                 image = Image.open(r'{0}/{1}'.format(msg_id,images[img]))
                 data = asarray(image)
             if data.shape < (2600,2000):
-                invalid = {"BI_RADS_prediction":"invalid_image_size"}
+                invalid = {"BI_RADS_prediction":{
+                    "error":"true",
+                    "msg":"invalid uploaded images, Size should be minimum 2600x2000 pixels"}}
                 if (not len(firebase_admin._apps)):
                     cred = credentials.Certificate(credential_json_file)
                     fa=firebase_admin.initialize_app(cred, {"databaseURL": databaseURL,'storageBucket':storageBucket})
