@@ -84,7 +84,10 @@ class PubsubMessageHandler():
                 #print('height: ', ht)
                 if data.shape < (2944,1920):
                     my_logger.info("client image resolutions {0}-{1} is smaller than 1920,2944".format(crop_img[i],data.shape))
-                    invalid = {"visualization":"invalid_image_size"}
+                    invalid = {"visualization":{
+                    	"msg":"invalid image resolutions for visualizations",
+                        "error":"true"}
+                    }
                   
                     if (not len(firebase_admin._apps)):
                         cred = credentials.Certificate(credential_json_file)
