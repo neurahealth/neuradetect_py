@@ -584,57 +584,30 @@ class PubsubMessageHandler():
         except Exception as e:
             # if imges dim is very small to process model sending error msg accordingly
             my_logger.info('ERROR: {}'.format(e))
-            image_CC=['L-CC.png','R-CC.png']
-            image_MLO=['L-MLO.png','R-MLO.png']
-            for img in range(0,2):
-                image = Image.open(r'sample_data/{0}/{1}'.format(msg_id,image_CC[img]))
-                data = asarray(image)
-                if data.shape >= (2677,1942):
-                    print("valid L-CC images")
-                else:
-                    invalid = {"invalid_CC_images":{
-                        "L-CC": str("{0} {1}".format(image_CC[0],data.shape)),
-                        "R-CC": str("{0} {1}".format(image_CC[1],data.shape))}}
-                    if (not len(firebase_admin._apps)):
-                        cred = credentials.Certificate(credential_json_file)
-                        fa=firebase_admin.initialize_app(cred, {"databaseURL": databaseURL,'storageBucket':storageBucket})
-                        fc=firebase_admin.firestore.client(fa)
-                        db = firestore.client()
-                        doc_ref = db.collection(u'stripe_customers/{0}/results'.format(userId)).document(currentTime)
-                        doc_ref.update(invalid)
-                    else:
-                        print('alredy initialize')
-                        db = firestore.client()
-                        doc_ref = db.collection(u'stripe_customers/{0}/results'.format(userId)).document(currentTime)
-                        doc_ref.update(invalid)
+    
+            invalid = {"Image_Predictions":{
+                'error':'true',
+                 'msg': "view mammography images size should be minimum 2677x1942 pixels and 2974x1748 pixels for CC and MLO"
+                 }}
+            visual_invalid ={"visualization":{
+				"msg":"invalid image resolutions for visualizations",
+                "error":"true"}}
+			if (not len(firebase_admin._apps)):
+            	cred = credentials.Certificate(credential_json_file)
+                fa=firebase_admin.initialize_app(cred, {"databaseURL": databaseURL,'storageBucket':storageBucket})
+                fc=firebase_admin.firestore.client(fa)
+                db = firestore.client()
+                doc_ref = db.collection(u'stripe_customers/{0}/results'.format(userId)).document(currentTime)
+                doc_ref.update(invalid)
+                doc_ref.update(visual_invalid)
+             else:
+                print('alredy initialize')
+                db = firestore.client()
+                doc_ref = db.collection(u'stripe_customers/{0}/results'.format(userId)).document(currentTime)
+                doc_ref.update(invalid)
+                doc_ref.update(visual_invalid)
 
-                    image = Image.open(r'sample_data/{0}/{1}'.format(msg_id,image_MLO[img]))
-                    data = asarray(image)
-                    if data.shape >= (2974,1748):
-                        print("valid MLO images")
-                        my_logger.info('{} image resize and successfully saved'.format(image_MLO[img]))
-                    else:
-                        invalid_mlo = {"invalid_MLO_images":{
-                            "L-MLO": str("{0} {1}".format(image_MLO[0],data.shape)),
-                            "R-MLO": str("{0} {1}".format(image_MLO[1],data.shape))}}
-
-                        print('INVALID MLO image format')
-
-                        if (not len(firebase_admin._apps)):
-                            cred = credentials.Certificate(credential_json_file)
-                            fa=firebase_admin.initialize_app(cred, {"databaseURL": databaseURL,'storageBucket':storageBucket})
-                            fc=firebase_admin.firestore.client(fa)
-                            db = firestore.client()
-                            doc_ref = db.collection(u'stripe_customers/{0}/results'.format(userId)).document(currentTime)
-                            doc_ref.update(invalid_mlo)
-                            my_logger.info('INVALID {} image resolutions'.format(image_CC[img]))
-                        else:
-                            print('alredy initialize')
-                            db = firestore.client()
-                            doc_ref = db.collection(u'stripe_customers/{0}/results'.format(userId)).document(currentTime)
-                            doc_ref.update(invalid_mlo)
-                            my_logger.info('INVALID {} image resolutions'.format(image_CC[img]))
-            my_logger.info("invalid images CC-MLO info saved in firebase")
+       		my_logger.info("invalid images CC-MLO info saved in firebase")
             logs_bucket = logs_bucket
             credential_json_file = credential_json_file
             storage_client = store.Client.from_service_account_json(credential_json_file)
